@@ -7,17 +7,28 @@
           <div class="font-12 fw-400">Build ai assistant</div>
         </div>
 
-        <div class="sidebar-list">
-          <div v-for="item in messageList" class="card">
+        <div class="sidebar-list mt-10">
+          <div v-for="(item,index) in messageList" class="card"
+               @click="handleServerChange(item)"
+               :class="{'active-card':currentServer.id===item.id}">
+            <ElIcon class="close-icon" @click.stop="deleteServerChat(item,index)" :size="16" color="#6a5c5c">
+              <CircleClose/>
+            </ElIcon>
             <div>{{ item.title }}</div>
             <div class="flex-align flex-between small-font">
               <span>{{ item.count }}条对话</span>
-              <span>{{ item.time }}</span>
+              <span>{{ dayjs(item.time).format('YYYY/MM/DD HH:mm:ss') }}</span>
             </div>
           </div>
         </div>
         <div class="sidebar-content">
-          <button>新聊天</button>
+          <ElButton @click="addNewChatServer">
+            <ElIcon class="close-icon" @click.stop="deleteServerChat" :size="16" color="#6a5c5c">
+              <CirclePlus/>
+            </ElIcon>
+            &nbsp;
+            新聊天
+          </ElButton>
         </div>
       </aside>
 
@@ -28,14 +39,33 @@
   </div>
 </template>
 
-<script setup>
-import {reactive} from "vue";
+<script setup lang="ts">
+import { reactive, ref } from "vue";
+import dayjs from "dayjs";
+import { ElIcon, ElButton } from 'element-plus'
+import { CircleClose, CirclePlus } from "@element-plus/icons-vue";
+import type { Message } from "@/types";
 
-const messageList = reactive([
-  {id: window.crypto.randomUUID(), title: 'demo1', time: '2024-2-1', count: 0},
-  {id: window.crypto.randomUUID(), title: 'demo2', time: '2024-2-1', count: 0},
+const messageList = reactive<Message[]>([
+  { id: window.crypto.randomUUID(), title: 'demo1', time: '2024-2-1 2:16:2', count: 0 },
+  { id: window.crypto.randomUUID(), title: 'demo2', time: '2024-2-1 3:26:21', count: 0 },
+  { id: window.crypto.randomUUID(), title: 'demo2', time: '2024-2-1 3:26:21', count: 0 },
+  { id: window.crypto.randomUUID(), title: 'demo2', time: '2024-2-1 3:26:21', count: 0 },
 ])
 
+const currentServer = ref<Message>(messageList[0])
+
+const handleServerChange = (data) => {
+  currentServer.value = data
+}
+
+const deleteServerChat = (data, index) => {
+  messageList.splice(index, 1)
+}
+
+const addNewChatServer = () => {
+  messageList.push({ id: window.crypto.randomUUID(), title: 'demo1', time: '2024-2-1 2:16:2', count: 0 })
+}
 </script>
 
 <style scoped lang="less">
@@ -68,6 +98,9 @@ const messageList = reactive([
   }
 
   .sidebar-list {
+    height: 80%;
+    overflow: auto;
+
     .card {
       box-shadow: var(--card-shadow);
       background-color: #ffffff;
@@ -77,19 +110,29 @@ const messageList = reactive([
       display: flex;
       gap: 10px;
       flex-direction: column;
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
+
+      &:hover .close-icon {
+        display: inline-block;
+      }
+    }
+
+    .active-card {
+      border: 2px solid var(--primary);
+    }
+
+    .close-icon {
+      display: none;
+      position: absolute;
+      top: 10px;
+      right: 10px;
     }
   }
 
   .sidebar-content {
     margin-top: 20px;
-  }
-
-  .sidebar-content button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
   }
 
   .main-content {
