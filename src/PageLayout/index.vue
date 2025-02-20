@@ -45,6 +45,10 @@ import dayjs from "dayjs";
 import { ElIcon, ElButton } from 'element-plus'
 import { CircleClose, CirclePlus } from "@element-plus/icons-vue";
 import type { Message } from "@/types";
+import { useChatStore } from "@/store/chat";
+
+const chatStore = useChatStore()
+const { setCurrentChat } = chatStore
 
 const messageList = reactive<Message[]>([
   { id: window.crypto.randomUUID(), title: 'demo1', time: '2024-2-1 2:16:2', count: 0 },
@@ -55,11 +59,12 @@ const messageList = reactive<Message[]>([
 
 const currentServer = ref<Message>(messageList[0])
 
-const handleServerChange = (data) => {
+const handleServerChange = (data: Message) => {
   currentServer.value = data
+  setCurrentChat(data)
 }
 
-const deleteServerChat = (data, index) => {
+const deleteServerChat = (_data: Message, index: number) => {
   messageList.splice(index, 1)
 }
 

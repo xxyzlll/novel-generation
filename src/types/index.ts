@@ -4,3 +4,4 @@ export interface Message {
     time: string,
     count: number
 }
+
